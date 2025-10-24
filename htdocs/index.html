@@ -112,7 +112,7 @@
                 
                 <!-- 完了ボタン -->
                 <button class="btn btn--primary btn--disabled" id="completeBtn" disabled>
-                    ストレッチ完了を記録
+                    <span class="btn__text">ストレッチ完了を記録</span>
                 </button>
             </section>
         </div>
@@ -166,10 +166,11 @@
     </div>
     
     <!-- フローティングボタン -->
-    <button class="fab" id="settingsBtn" aria-label="設定を開く">⚙️</button>
+    <button class="fab" id="settingsBtn" aria-label="設定を開く" type="button">
+        <span class="fab__icon">⚙️</span>
+    </button>
     
     <!-- JavaScript -->
-    <script src="/js/touch-helper.js" type="module"></script>
     <script src="/js/storage.js" type="module"></script>
     <script src="/js/timer.js" type="module"></script>
     <script src="/js/orientation.js" type="module"></script>

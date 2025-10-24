@@ -3,7 +3,6 @@ import { OrientationManager } from './orientation.js';
 import { NotificationManager } from './notification.js';
 import { StorageManager } from './storage.js';
 import { PWAManager } from './pwa.js';
-import { touchHelper } from './touch-helper.js';
 
 class StretchTimerApp {
     constructor() {
@@ -25,51 +24,123 @@ class StretchTimerApp {
         this.updateUI();
         this.startInitialTimer();
         
-        // iOS対応のタッチ設定
-        this.setupTouchHandling();
+        // iPhone実機テスト用デバッグ
+        this.setupDebugInfo();
         
         this.timerManager.on('complete', this.handleTimerComplete.bind(this));
         this.orientationManager.on('statusChange', this.handleOrientationChange.bind(this));
     }
     
-    setupTouchHandling() {
-        // すべてのボタンにiOS対応を適用
-        touchHelper.setupAllButtons();
+    setupDebugInfo() {
+        // iPhone実機での動作確認用
+        console.log('=== iPhone実機デバッグ情報 ===');
+        console.log('User Agent:', navigator.userAgent);
+        console.log('Touch Events:', 'ontouchstart' in window);
+        console.log('Viewport Size:', window.innerWidth, 'x', window.innerHeight);
+        console.log('Device Pixel Ratio:', window.devicePixelRatio);
         
-        // デバッグ情報をコンソールに出力
-        console.log('Touch Helper Debug:', touchHelper.getDebugInfo());
+        // タッチイベントテスト用の視覚的フィードバック
+        document.addEventListener('touchstart', () => {
+            console.log('Touch Start detected');
+            document.body.style.backgroundColor = '#E8F5E8';
+            setTimeout(() => {
+                document.body.style.backgroundColor = '';
+            }, 100);
+        }, { passive: true });
     }
     
     setupEventListeners() {
-        // 設定画面切り替え
-        const settingsBtn = document.getElementById('settingsBtn');
-        const backBtn = document.getElementById('backBtn');
-        
-        touchHelper.addTouchListener(settingsBtn, () => this.showScreen('settings'), {
-            preventDefault: true,
-            debounce: 200
-        });
-        touchHelper.addTouchListener(backBtn, () => this.showScreen('main'), {
-            preventDefault: true,
-            debounce: 200
-        });
-        
-        // ストレッチ完了ボタン
-        const completeBtn = document.getElementById('completeBtn');
-        touchHelper.addTouchListener(completeBtn, this.handleStretchComplete.bind(this), {
-            preventDefault: true,
-            debounce: 300
-        });
-        
-        // 次のカウントダウン開始ボタン
-        const nextCountdownBtn = document.getElementById('nextCountdownBtn');
-        touchHelper.addTouchListener(nextCountdownBtn, this.startNewTimer.bind(this), {
-            preventDefault: true,
-            debounce: 300
-        });
+        // iOS実機対応：シンプルなイベントリスナー
+        this.addIOSEventListener('settingsBtn', () => this.showScreen('settings'));
+        this.addIOSEventListener('backBtn', () => this.showScreen('main'));
+        this.addIOSEventListener('completeBtn', this.handleStretchComplete.bind(this));
+        this.addIOSEventListener('nextCountdownBtn', this.startNewTimer.bind(this));
         
         // 設定変更イベント
         this.setupSettingsEvents();
+    }
+    
+    // iPhone実機で確実に動作するイベントリスナー
+    addIOSEventListener(elementId, handler) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        
+        // 複数のイベントを同時に登録（iPhone実機対応）
+        const events = ['click', 'touchend'];
+        let handled = false;
+        
+        const wrappedHandler = (event) => {
+            // 重複実行防止
+            if (handled) {
+                handled = false;
+                return;
+            }
+            handled = true;
+            setTimeout(() => { handled = false; }, 300);
+            
+            event.preventDefault();
+            event.stopPropagation();
+            
+            try {
+                handler(event);
+            } catch (error) {
+                console.error('Event handler error:', error);
+            }
+        };
+        
+        events.forEach(eventType => {
+            element.addEventListener(eventType, wrappedHandler, {
+                passive: false
+            });
+        });
+        
+        console.log(`Event listeners added to ${elementId}:`, events);
+        
+        // iPhone実機テスト用：ボタンに視覚的フィードバックを追加
+        element.style.transition = 'all 0.1s ease';
+        element.addEventListener('touchstart', () => {
+            element.style.backgroundColor = '#45a049';
+            element.style.transform = 'scale(0.95)';
+        }, { passive: true });
+        
+        element.addEventListener('touchend', () => {
+            setTimeout(() => {
+                element.style.backgroundColor = '';
+                element.style.transform = '';
+            }, 100);
+        }, { passive: true });
+    }
+    
+    // 要素に直接イベントリスナーを追加（プリセットボタン用）
+    addIOSEventListenerToElement(element, handler) {
+        if (!element) return;
+        
+        const events = ['click', 'touchend'];
+        let handled = false;
+        
+        const wrappedHandler = (event) => {
+            if (handled) {
+                handled = false;
+                return;
+            }
+            handled = true;
+            setTimeout(() => { handled = false; }, 300);
+            
+            event.preventDefault();
+            event.stopPropagation();
+            
+            try {
+                handler(event);
+            } catch (error) {
+                console.error('Event handler error:', error);
+            }
+        };
+        
+        events.forEach(eventType => {
+            element.addEventListener(eventType, wrappedHandler, {
+                passive: false
+            });
+        });
     }
     
     setupSettingsEvents() {
@@ -85,17 +156,15 @@ class StretchTimerApp {
         
         // プリセットボタン
         const presetButtons = document.querySelectorAll('.preset-btn');
-        presetButtons.forEach(btn => {
-            touchHelper.addTouchListener(btn, (e) => {
+        presetButtons.forEach((btn, index) => {
+            this.addIOSEventListenerToElement(btn, (e) => {
                 const value = parseInt(e.target.dataset.value);
                 intervalSlider.value = value;
                 intervalValue.textContent = value;
                 this.storageManager.saveSetting('interval', value);
                 this.updatePresetButtons(value);
-            }, {
-                preventDefault: true,
-                debounce: 200
             });
+            console.log(`Preset button ${index} (${btn.dataset.value}min) event listener added`);
         });
         
         // 通知設定

@@ -251,9 +251,12 @@ body {
     color: var(--text-primary);
 }
 
-/* ボタンスタイル */
+/* ボタンスタイル - iPhone実機対応 */
 .btn {
-    display: inline-block;
+    /* iPhone実機で確実にタップできる設定 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: var(--spacing-md) var(--spacing-lg);
     font-size: var(--font-size-md);
     font-weight: 500;
@@ -263,19 +266,30 @@ body {
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all var(--transition-fast);
-    min-height: 44px;
+    min-height: 48px;  /* iPhone推奨サイズ */
+    min-width: 48px;   /* iPhone推奨サイズ */
     line-height: 1.2;
     
-    /* iOS タッチ対応 */
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    /* iPhone実機タッチ対応 */
+    -webkit-tap-highlight-color: rgba(76, 175, 80, 0.3);
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
     touch-action: manipulation;
+    -webkit-appearance: none;
+    appearance: none;
     
-    /* より大きなタッチターゲット */
-    min-width: 44px;
+    /* より確実なタッチ判定 */
     position: relative;
+    z-index: 10;
+    box-sizing: border-box;
+}
+
+/* ボタン内テキストのスタイル */
+.btn__text {
+    pointer-events: none;  /* クリックイベントをボタンに委譲 */
+    display: block;
+    width: 100%;
 }
 
 .btn--primary {
@@ -359,13 +373,13 @@ body {
     }
 }
 
-/* フローティングアクションボタン */
+/* フローティングアクションボタン - iPhone実機対応 */
 .fab {
     position: fixed;
     bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
     right: calc(var(--spacing-lg) + env(safe-area-inset-right));
-    width: 56px;
-    height: 56px;
+    width: 64px;  /* iPhone実機でタップしやすいサイズ */
+    height: 64px;
     border-radius: var(--radius-full);
     background-color: var(--color-primary);
     color: var(--text-inverse);
@@ -375,9 +389,25 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-xl);
     transition: all var(--transition-fast);
     z-index: 1000;
+    
+    /* iPhone実機タッチ対応 */
+    -webkit-tap-highlight-color: rgba(76, 175, 80, 0.3);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+}
+
+/* FABアイコンのスタイル */
+.fab__icon {
+    pointer-events: none;  /* クリックイベントをボタンに委譲 */
+    display: block;
 }
 
 .fab:hover {
