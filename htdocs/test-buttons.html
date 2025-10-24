@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>iPhone実機ボタンテスト</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        
+        .test-button {
+            display: block;
+            width: 280px;
+            height: 60px;
+            margin: 20px auto;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            
+            /* iPhone実機対応 */
+            -webkit-tap-highlight-color: rgba(76, 175, 80, 0.5);
+            -webkit-appearance: none;
+            touch-action: manipulation;
+        }
+        
+        .test-button:active {
+            background: #45a049;
+            transform: scale(0.98);
+        }
+        
+        .result {
+            text-align: center;
+            margin: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            min-height: 30px;
+        }
+        
+        .success {
+            background: #d4edda !important;
+            color: #155724;
+        }
+        
+        .debug-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">iPhone実機ボタンテスト</h1>
+    
+    <div class="debug-info" id="debugInfo">
+        <strong>デバッグ情報:</strong><br>
+        環境情報を読み込み中...
+    </div>
+    
+    <!-- 基本的なHTMLボタン（onclick属性） -->
+    <button class="test-button" onclick="testClick('HTML onclick')">
+        HTMLボタン (onclick属性)
+    </button>
+    <div class="result" id="result1">未テスト</div>
+    
+    <!-- JavaScriptイベントリスナー -->
+    <button class="test-button" id="jsButton">
+        JavaScriptボタン (addEventListener)
+    </button>
+    <div class="result" id="result2">未テスト</div>
+    
+    <!-- タッチイベント専用 -->
+    <button class="test-button" id="touchButton">
+        タッチイベントボタン (touchend)
+    </button>
+    <div class="result" id="result3">未テスト</div>
+    
+    <!-- フォーム送信ボタン -->
+    <form onsubmit="testClick('フォーム送信'); return false;">
+        <button class="test-button" type="submit">
+            フォーム送信ボタン
+        </button>
+    </form>
+    <div class="result" id="result4">未テスト</div>
+    
+    <!-- Aタグでボタン風 -->
+    <a href="#" class="test-button" onclick="testClick('Aタグボタン'); return false;" 
+       style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+        Aタグボタン
+    </a>
+    <div class="result" id="result5">未テスト</div>
+
+    <script>
+        let testCount = 0;
+        
+        // デバッグ情報を表示
+        function showDebugInfo() {
+            const info = document.getElementById('debugInfo');
+            info.innerHTML = `
+                <strong>デバッグ情報:</strong><br>
+                User Agent: ${navigator.userAgent}<br>
+                Touch Support: ${'ontouchstart' in window}<br>
+                Screen Size: ${screen.width}x${screen.height}<br>
+                Window Size: ${window.innerWidth}x${window.innerHeight}<br>
+                Device Pixel Ratio: ${window.devicePixelRatio}<br>
+                Location: ${location.href}<br>
+                Protocol: ${location.protocol}
+            `;
+        }
+        
+        // テスト結果表示
+        function testClick(buttonType) {
+            testCount++;
+            console.log(`ボタンテスト ${testCount}: ${buttonType}`);
+            
+            // 対応する結果エリアに成功を表示
+            const resultId = buttonType.includes('HTML') ? 'result1' :
+                           buttonType.includes('JavaScript') ? 'result2' :
+                           buttonType.includes('タッチ') ? 'result3' :
+                           buttonType.includes('フォーム') ? 'result4' :
+                           'result5';
+            
+            const resultElement = document.getElementById(resultId);
+            resultElement.textContent = `成功! (${new Date().toLocaleTimeString()})`;
+            resultElement.className = 'result success';
+            
+            // 画面全体に視覚的フィードバック
+            document.body.style.background = '#e8f5e8';
+            setTimeout(() => {
+                document.body.style.background = '#f0f0f0';
+            }, 200);
+            
+            alert(`${buttonType} が正常に動作しました!`);
+        }
+        
+        // JavaScriptイベントリスナーの設定
+        document.addEventListener('DOMContentLoaded', function() {
+            showDebugInfo();
+            
+            // 通常のクリックイベント
+            const jsButton = document.getElementById('jsButton');
+            if (jsButton) {
+                jsButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    testClick('JavaScriptボタン');
+                });
+            }
+            
+            // タッチイベント専用
+            const touchButton = document.getElementById('touchButton');
+            if (touchButton) {
+                let touchStartTime = 0;
+                
+                touchButton.addEventListener('touchstart', function(e) {
+                    touchStartTime = Date.now();
+                    this.style.background = '#45a049';
+                }, { passive: true });
+                
+                touchButton.addEventListener('touchend', function(e) {
+                    const touchDuration = Date.now() - touchStartTime;
+                    this.style.background = '#4CAF50';
+                    
+                    if (touchDuration < 500) { // 短いタップのみ有効
+                        e.preventDefault();
+                        testClick('タッチイベントボタン');
+                    }
+                }, { passive: false });
+            }
+            
+            // 全画面タッチ検出
+            document.addEventListener('touchstart', function() {
+                console.log('画面タッチ検出');
+            }, { passive: true });
+        });
+        
+        // ウィンドウサイズ変更時のデバッグ情報更新
+        window.addEventListener('resize', showDebugInfo);
+    </script>
+</body>
+</html>

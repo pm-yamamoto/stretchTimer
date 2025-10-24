@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="定期的なストレッチを促進するタイマーアプリ">
+    <meta name="theme-color" content="#4CAF50">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/dark-theme.css">
+    
+    <title>ストレッチタイマー</title>
+    <style>
+        /* ngrok環境での追加スタイル */
+        .btn {
+            /* より確実なタップ判定 */
+            position: relative !important;
+            z-index: 100 !important;
+            background: #4CAF50 !important;
+            border: 2px solid #4CAF50 !important;
+            
+            /* iPhone実機での確実なタップ */
+            -webkit-tap-highlight-color: rgba(76, 175, 80, 0.8) !important;
+            -webkit-touch-callout: none !important;
+            -webkit-user-select: none !important;
+            user-select: none !important;
+        }
+        
+        .btn:active {
+            background: #45a049 !important;
+            border-color: #45a049 !important;
+            transform: scale(0.95) !important;
+        }
+        
+        .fab {
+            z-index: 9999 !important;
+            background: #4CAF50 !important;
+            border: 3px solid #ffffff !important;
+        }
+        
+        /* ngrok環境のデバッグ表示 */
+        .ngrok-debug {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 193, 7, 0.9);
+            color: #000;
+            padding: 5px;
+            font-size: 12px;
+            z-index: 10000;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- ngrokデバッグ情報 -->
+    <div class="ngrok-debug" id="ngrokDebug">
+        ngrok環境 - デバッグモード
+    </div>
+
+    <div class="app-container">
+        <!-- メイン画面 -->
+        <main class="main-screen" id="mainScreen">
+            <!-- ヘッダー -->
+            <header class="header">
+                <h1 class="header__title">NEXT STRETCH IN</h1>
+            </header>
+            
+            <!-- タイマー表示エリア -->
+            <section class="timer-section">
+                <div class="timer-display">
+                    <div class="timer-display__time" id="timerDisplay">00:30:00</div>
+                </div>
+                
+                <div class="timer-info">
+                    <p class="timer-info__next-time">次回予定時刻: <span id="nextTime">18:24:30</span></p>
+                </div>
+                
+                <!-- プログレスバー -->
+                <div class="progress-bar">
+                    <div class="progress-bar__fill" id="progressBar"></div>
+                </div>
+                
+                <p class="timer-status" id="timerStatus">タイマー作動中、完了までお待ちください。</p>
+            </section>
+            
+            <!-- コントロールボタン -->
+            <section class="controls">
+                <!-- シンプルなonclick形式 -->
+                <button class="btn btn--link" onclick="handleNextCountdown()">次のカウントダウンを開始</button>
+                <p class="last-record">最終記録: <span id="lastRecord">未記録</span></p>
+            </section>
+        </main>
+        
+        <!-- 設定画面 -->
+        <div class="settings-screen" id="settingsScreen" style="display: none;">
+            <header class="header">
+                <h1 class="header__title">設定</h1>
+                <button class="btn btn--text" onclick="showMainScreen()">戻る</button>
+            </header>
+            
+            <section class="settings-content">
+                <div class="setting-item">
+                    <label for="intervalSlider" class="setting-item__label">ストレッチ間隔</label>
+                    <input type="range" id="intervalSlider" class="setting-item__slider" 
+                           min="15" max="240" value="30" step="5"
+                           onchange="updateInterval(this.value)">
+                    <span class="setting-item__value"><span id="intervalValue">30</span>分</span>
+                </div>
+                
+                <div class="setting-presets">
+                    <button class="btn btn--outline" onclick="setPreset(30)">30分</button>
+                    <button class="btn btn--outline" onclick="setPreset(60)">60分</button>
+                    <button class="btn btn--outline" onclick="setPreset(90)">90分</button>
+                    <button class="btn btn--outline" onclick="setPreset(120)">120分</button>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <!-- フローティングボタン（シンプル版） -->
+    <button class="fab" onclick="showSettingsScreen()" aria-label="設定を開く" type="button">
+        <span class="fab__icon">⚙️</span>
+    </button>
+    
+    <script>
+        // ngrok環境用のシンプルなJavaScript
+        console.log('=== ngrok環境デバッグ ===');
+        console.log('URL:', location.href);
+        console.log('User Agent:', navigator.userAgent);
+        console.log('Touch Events:', 'ontouchstart' in window);
+        
+        // デバッグ情報更新
+        function updateDebugInfo() {
+            const debugElement = document.getElementById('ngrokDebug');
+            const now = new Date().toLocaleTimeString();
+            debugElement.textContent = `ngrok環境 [${now}] - タッチ: ${'ontouchstart' in window} - サイズ: ${window.innerWidth}x${window.innerHeight}`;
+        }
+        
+        updateDebugInfo();
+        setInterval(updateDebugInfo, 1000);
+        
+        // シンプルな画面切り替え
+        function showSettingsScreen() {
+            console.log('設定画面を表示');
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('settingsScreen').style.display = 'block';
+            
+            // 視覚的フィードバック
+            document.body.style.background = '#e8f5e8';
+            setTimeout(() => document.body.style.background = '', 200);
+        }
+        
+        function showMainScreen() {
+            console.log('メイン画面を表示');
+            document.getElementById('settingsScreen').style.display = 'none';
+            document.getElementById('mainScreen').style.display = 'block';
+            
+            // 視覚的フィードバック
+            document.body.style.background = '#e8f5e8';
+            setTimeout(() => document.body.style.background = '', 200);
+        }
+        
+        function handleNextCountdown() {
+            console.log('次のカウントダウンボタン押下');
+            alert('次のカウントダウンが開始されました！');
+        }
+        
+        function updateInterval(value) {
+            console.log('間隔変更:', value);
+            document.getElementById('intervalValue').textContent = value;
+        }
+        
+        function setPreset(minutes) {
+            console.log('プリセット設定:', minutes);
+            document.getElementById('intervalSlider').value = minutes;
+            document.getElementById('intervalValue').textContent = minutes;
+            alert(`${minutes}分に設定しました`);
+        }
+        
+        // タッチイベントの検出
+        document.addEventListener('touchstart', function(e) {
+            console.log('Touch Start:', e.touches.length);
+        }, { passive: true });
+        
+        document.addEventListener('touchend', function(e) {
+            console.log('Touch End:', e.changedTouches.length);
+        }, { passive: true });
+        
+        // クリックイベントの検出
+        document.addEventListener('click', function(e) {
+            console.log('Click Event:', e.target.tagName, e.target.className);
+        });
+        
+        // 初期化完了
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM読み込み完了 - ngrok環境準備完了');
+        });
+    </script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 // Service Worker for Stretch Timer PWA
+// TEMPORARY: ngrokテスト用に機能を簡素化
 const CACHE_NAME = 'stretch-timer-v1';
 const STATIC_CACHE_FILES = [
     '/',
