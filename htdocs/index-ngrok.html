@@ -53,6 +53,22 @@
             z-index: 10000;
             text-align: center;
         }
+        
+        /* 方向選択セレクトボックス */
+        .setting-item__select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            color: #212121;
+            background-color: #ffffff;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            margin: 8px 0;
+            -webkit-appearance: none;
+            appearance: none;
+        }
     </style>
 </head>
 <body>
@@ -106,16 +122,56 @@
                 <div class="setting-item">
                     <label for="intervalSlider" class="setting-item__label">ストレッチ間隔</label>
                     <input type="range" id="intervalSlider" class="setting-item__slider" 
-                           min="15" max="240" value="30" step="5"
+                           min="3" max="240" value="30" step="1"
                            onchange="updateInterval(this.value)">
                     <span class="setting-item__value"><span id="intervalValue">30</span>分</span>
                 </div>
                 
                 <div class="setting-presets">
+                    <button class="btn btn--outline" onclick="setPreset(3)">3分</button>
+                    <button class="btn btn--outline" onclick="setPreset(5)">5分</button>
+                    <button class="btn btn--outline" onclick="setPreset(10)">10分</button>
+                    <button class="btn btn--outline" onclick="setPreset(15)">15分</button>
                     <button class="btn btn--outline" onclick="setPreset(30)">30分</button>
                     <button class="btn btn--outline" onclick="setPreset(60)">60分</button>
-                    <button class="btn btn--outline" onclick="setPreset(90)">90分</button>
-                    <button class="btn btn--outline" onclick="setPreset(120)">120分</button>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="directionSelect" class="setting-item__label">目標方向</label>
+                    <select id="directionSelect" class="setting-item__select" onchange="setDirection(this.value)">
+                        <option value="0">北 (N)</option>
+                        <option value="90">東 (E)</option>
+                        <option value="180">南 (S)</option>
+                        <option value="270">西 (W)</option>
+                    </select>
+                </div>
+                
+                <!-- デバッグ設定 -->
+                <div class="setting-item" style="border-top: 1px solid #e0e0e0; padding-top: 16px; margin-top: 16px;">
+                    <label class="setting-item__label">開発者向け設定</label>
+                    
+                    <label style="display: flex; align-items: center; margin: 8px 0;">
+                        <input type="checkbox" id="debugModeToggle" onchange="toggleDebugMode(this.checked)">
+                        <span style="margin-left: 8px;">デバッグモード</span>
+                    </label>
+                    
+                    <div id="debugControls" style="display: none;">
+                        <label style="display: flex; align-items: center; margin: 8px 0;">
+                            <input type="checkbox" id="manualOrientationToggle" onchange="toggleManualMode(this.checked)">
+                            <span style="margin-left: 8px;">手動方向入力</span>
+                        </label>
+                        
+                        <div id="manualOrientation" style="display: none;">
+                            <label class="setting-item__label">Alpha (方位角) 0-360°</label>
+                            <input type="range" id="manualAlpha" min="0" max="360" value="0" step="1" 
+                                   style="width: 100%;" oninput="updateManualValue('Alpha', this.value)">
+                            <span style="font-size: 14px;"><span id="manualAlphaValue">0</span>°</span>
+                        </div>
+                        
+                        <div id="debugInfo" style="font-size: 12px; font-family: monospace; margin-top: 16px; padding: 8px; background: #f5f5f5;">
+                            デバッグ情報
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
@@ -179,6 +235,57 @@
             document.getElementById('intervalSlider').value = minutes;
             document.getElementById('intervalValue').textContent = minutes;
             alert(`${minutes}分に設定しました`);
+        }
+        
+        function setDirection(direction) {
+            console.log('方向設定:', direction);
+            const directionNames = {'0': '北', '90': '東', '180': '南', '270': '西'};
+            const directionName = directionNames[direction] || '不明';
+            alert(`目標方向を${directionName}に設定しました`);
+        }
+        
+        // デバッグ機能
+        let debugMode = false;
+        let manualMode = false;
+        let manualAlpha = 0;
+        
+        function toggleDebugMode(enabled) {
+            debugMode = enabled;
+            document.getElementById('debugControls').style.display = enabled ? 'block' : 'none';
+            console.log('Debug mode:', enabled);
+            
+            if (enabled) {
+                startDebugInfoUpdate();
+            }
+        }
+        
+        function toggleManualMode(enabled) {
+            manualMode = enabled;
+            document.getElementById('manualOrientation').style.display = enabled ? 'block' : 'none';
+            console.log('Manual orientation mode:', enabled);
+        }
+        
+        function updateManualValue(type, value) {
+            manualAlpha = parseFloat(value);
+            document.getElementById('manualAlphaValue').textContent = value;
+            console.log(`Manual ${type}: ${value}°`);
+        }
+        
+        function startDebugInfoUpdate() {
+            if (debugMode) {
+                setInterval(() => {
+                    const debugInfo = document.getElementById('debugInfo');
+                    if (debugInfo && debugMode) {
+                        const now = new Date().toLocaleTimeString();
+                        debugInfo.innerHTML = `
+                            [${now}]<br>
+                            Alpha: ${manualMode ? manualAlpha : 'センサー値'}°<br>
+                            モード: ${manualMode ? '手動入力' : 'デバイスセンサー'}<br>
+                            デバッグモード: 有効
+                        `;
+                    }
+                }, 500);
+            }
         }
         
         // タッチイベントの検出

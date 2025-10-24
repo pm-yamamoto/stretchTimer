@@ -17,6 +17,11 @@ export class OrientationManager extends EventTarget {
         this.monitoringStartTime = null;
         this.eventHandler = this.handleDeviceOrientation.bind(this);
         
+        // デバッグ用設定
+        this.isManualMode = false;
+        this.manualOrientation = { alpha: 0, beta: 0, gamma: 0 };
+        this.isDebugging = false;
+        
         this.checkSupport();
     }
     
@@ -73,6 +78,9 @@ export class OrientationManager extends EventTarget {
         
         this.dispatchEvent(new CustomEvent('monitoringStart'));
         console.log('Started orientation monitoring');
+        console.log('Target direction:', this.targetDirection + '°');
+        console.log('Manual mode:', this.isManualMode ? 'enabled' : 'disabled');
+        console.log('Chrome DevTools: Use Sensors tab to simulate orientation');
     }
     
     stopMonitoring() {
@@ -88,16 +96,39 @@ export class OrientationManager extends EventTarget {
     handleDeviceOrientation(event) {
         if (!this.isMonitoring) return;
         
-        // iOS Safariの場合、webkitCompassHeadingを使用
-        const alpha = event.webkitCompassHeading !== null 
-            ? 360 - event.webkitCompassHeading  // iOS: webkitCompassHeadingは逆向き
-            : event.alpha;  // Android Chrome
+        // 手動モードの場合は手動値を使用
+        if (this.isManualMode) {
+            this.currentOrientation = { ...this.manualOrientation };
+        } else {
+            // デバイスの向き値を取得
+            let alpha, beta, gamma;
             
-        this.currentOrientation = {
-            alpha: alpha !== null ? alpha : 0,
-            beta: event.beta !== null ? event.beta : 0,
-            gamma: event.gamma !== null ? event.gamma : 0
-        };
+            // iOS Safari の場合
+            if (event.webkitCompassHeading !== null && event.webkitCompassHeading !== undefined) {
+                alpha = 360 - event.webkitCompassHeading;  // iOS: webkitCompassHeadingは逆向き
+            } 
+            // Chrome デベロッパーツール Sensors や Android Chrome の場合
+            else if (event.alpha !== null && event.alpha !== undefined) {
+                alpha = event.alpha;
+            } 
+            else {
+                alpha = 0;
+            }
+            
+            beta = event.beta !== null && event.beta !== undefined ? event.beta : 0;
+            gamma = event.gamma !== null && event.gamma !== undefined ? event.gamma : 0;
+                
+            this.currentOrientation = { alpha, beta, gamma };
+            
+            // デバッグログ（Chrome DevToolsでの確認用）
+            if (this.isDebugging) {
+                console.log(`DeviceOrientation - Raw: α=${event.alpha} β=${event.beta} γ=${event.gamma}`);
+                console.log(`DeviceOrientation - Used: α=${alpha} β=${beta} γ=${gamma}`);
+                if (event.webkitCompassHeading !== null) {
+                    console.log(`iOS webkitCompassHeading: ${event.webkitCompassHeading}`);
+                }
+            }
+        }
         
         const status = this.analyzeOrientation();
         this.dispatchEvent(new CustomEvent('orientationChange', { detail: status }));
@@ -195,6 +226,45 @@ export class OrientationManager extends EventTarget {
     
     setDirectionThreshold(degrees) {
         this.directionThreshold = Math.max(5, Math.min(180, degrees));
+    }
+    
+    // デバッグ用：手動モードの制御
+    setManualMode(enabled) {
+        this.isManualMode = enabled;
+        console.log(`Manual orientation mode: ${enabled ? 'enabled' : 'disabled'}`);
+        
+        if (this.isMonitoring) {
+            // 手動モード切り替え時に即座にステータス更新
+            this.triggerStatusUpdate();
+        }
+    }
+    
+    setDebugging(enabled) {
+        this.isDebugging = enabled;
+        console.log(`Orientation debugging: ${enabled ? 'enabled' : 'disabled'}`);
+    }
+    
+    setManualOrientation(alpha, beta, gamma) {
+        this.manualOrientation = {
+            alpha: alpha !== undefined ? parseFloat(alpha) : this.manualOrientation.alpha,
+            beta: beta !== undefined ? parseFloat(beta) : this.manualOrientation.beta,
+            gamma: gamma !== undefined ? parseFloat(gamma) : this.manualOrientation.gamma
+        };
+        
+        if (this.isManualMode && this.isMonitoring) {
+            this.triggerStatusUpdate();
+        }
+    }
+    
+    triggerStatusUpdate() {
+        // 手動で状態更新をトリガー
+        if (this.isManualMode) {
+            this.currentOrientation = { ...this.manualOrientation };
+        }
+        
+        const status = this.analyzeOrientation();
+        this.dispatchEvent(new CustomEvent('orientationChange', { detail: status }));
+        this.dispatchEvent(new CustomEvent('statusChange', { detail: status }));
     }
     
     getCurrentOrientation() {

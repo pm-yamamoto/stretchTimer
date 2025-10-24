@@ -497,11 +497,45 @@ body {
     text-align: right;
 }
 
+.setting-item__select {
+    width: 100%;
+    padding: var(--spacing-md);
+    font-size: var(--font-size-md);
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-md);
+    outline: none;
+    cursor: pointer;
+    margin: var(--spacing-sm) 0;
+    
+    /* iPhone実機タッチ対応 */
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23757575" stroke-width="2"><polyline points="6,9 12,15 18,9"></polyline></svg>');
+    background-repeat: no-repeat;
+    background-position: right var(--spacing-md) center;
+    background-size: 16px 16px;
+    padding-right: calc(var(--spacing-lg) + 24px);
+}
+
+.setting-item__select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
 .setting-presets {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-sm);
     margin: var(--spacing-md) 0;
+}
+
+/* モバイル（小画面）では2列に */
+@media (max-width: 480px) {
+    .setting-presets {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .preset-btn {

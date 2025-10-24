@@ -29,6 +29,9 @@ class StretchTimerApp {
         
         this.timerManager.on('complete', this.handleTimerComplete.bind(this));
         this.orientationManager.on('statusChange', this.handleOrientationChange.bind(this));
+        
+        // 設定から方向を読み込み、OrientationManagerに適用
+        this.applyOrientationSettings();
     }
     
     setupDebugInfo() {
@@ -167,6 +170,15 @@ class StretchTimerApp {
             console.log(`Preset button ${index} (${btn.dataset.value}min) event listener added`);
         });
         
+        // 方向設定
+        const directionSelect = document.getElementById('directionSelect');
+        directionSelect?.addEventListener('change', (e) => {
+            const direction = parseInt(e.target.value);
+            this.storageManager.saveSetting('targetDirection', direction);
+            this.orientationManager.setTargetDirection(direction);
+            console.log('Target direction changed to:', direction);
+        });
+        
         // 通知設定
         const notificationToggle = document.getElementById('notificationToggle');
         const vibrationToggle = document.getElementById('vibrationToggle');
@@ -187,6 +199,117 @@ class StretchTimerApp {
             this.storageManager.saveSetting('darkMode', e.target.checked);
             this.toggleDarkMode(e.target.checked);
         });
+        
+        // デバッグモード設定
+        this.setupDebugControls();
+    }
+    
+    setupDebugControls() {
+        const debugModeToggle = document.getElementById('debugModeToggle');
+        const debugControls = document.getElementById('debugControls');
+        const manualOrientationToggle = document.getElementById('manualOrientationToggle');
+        const manualOrientation = document.getElementById('manualOrientation');
+        const debugInfo = document.getElementById('debugInfo');
+        
+        // デバッグモード切り替え
+        debugModeToggle?.addEventListener('change', (e) => {
+            debugControls.style.display = e.target.checked ? 'block' : 'none';
+            this.orientationManager.setDebugging(e.target.checked);
+            console.log('Debug mode:', e.target.checked);
+        });
+        
+        // 手動入力モード切り替え
+        manualOrientationToggle?.addEventListener('change', (e) => {
+            manualOrientation.style.display = e.target.checked ? 'block' : 'none';
+            this.orientationManager.setManualMode(e.target.checked);
+            
+            if (e.target.checked) {
+                // 手動モード有効時：スライダーの値でOrientationManagerを更新
+                this.updateManualOrientation();
+            }
+        });
+        
+        // 手動入力スライダーのイベント設定
+        this.setupManualOrientationSliders();
+        
+        // デバッグ情報の定期更新
+        if (debugInfo) {
+            setInterval(() => {
+                this.updateDebugInfo();
+            }, 100);
+        }
+    }
+    
+    setupManualOrientationSliders() {
+        const sliders = ['manualAlpha', 'manualBeta', 'manualGamma'];
+        const valueSpans = ['manualAlphaValue', 'manualBetaValue', 'manualGammaValue'];
+        
+        sliders.forEach((sliderId, index) => {
+            const slider = document.getElementById(sliderId);
+            const valueSpan = document.getElementById(valueSpans[index]);
+            
+            slider?.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                valueSpan.textContent = value;
+                this.updateManualOrientation();
+            });
+        });
+    }
+    
+    updateManualOrientation() {
+        const alpha = parseFloat(document.getElementById('manualAlpha')?.value || 0);
+        const beta = parseFloat(document.getElementById('manualBeta')?.value || 0);
+        const gamma = parseFloat(document.getElementById('manualGamma')?.value || 0);
+        
+        this.orientationManager.setManualOrientation(alpha, beta, gamma);
+    }
+    
+    updateDebugInfo() {
+        const debugInfo = document.getElementById('debugInfo');
+        if (!debugInfo) return;
+        
+        const orientation = this.orientationManager.getCurrentOrientation();
+        const status = this.orientationManager.analyzeOrientation();
+        const isManualMode = this.orientationManager.isManualMode;
+        
+        const alpha = orientation.alpha?.toFixed(1) || '0.0';
+        const beta = orientation.beta?.toFixed(1) || '0.0';
+        const gamma = orientation.gamma?.toFixed(1) || '0.0';
+        
+        const uprightStatus = status.isUpright ? '✓ OK' : '✗ NG';
+        const directionStatus = status.isDirectionCorrect ? '✓ OK' : '✗ NG';
+        
+        // 目標方向の名前を取得
+        const settings = this.storageManager.loadSettings();
+        const targetDirection = settings.targetDirection || 0;
+        const directionNames = {0: '北', 90: '東', 180: '南', 270: '西'};
+        const targetDirectionName = directionNames[targetDirection] || '不明';
+        
+        const modeText = isManualMode ? '手動入力' : 'デバイスセンサー';
+        const timestamp = new Date().toLocaleTimeString();
+        
+        debugInfo.innerHTML = `
+            <strong>[${timestamp}] DeviceOrientation</strong><br>
+            モード: ${modeText}<br>
+            現在値: α=${alpha}° β=${beta}° γ=${gamma}°<br>
+            立位判定: ${uprightStatus} (閾値±30°)<br>
+            方向判定: ${status.direction} ${directionStatus}<br>
+            目標方向: ${targetDirectionName} (${targetDirection}°)<br>
+            角度差: ${status.angleDifference?.toFixed(1)}°<br>
+            完了可能: ${status.canComplete ? '✓ はい' : '✗ いいえ'}
+        `;
+    }
+    
+    applyOrientationSettings() {
+        const settings = this.storageManager.loadSettings();
+        const targetDirection = settings.targetDirection || 0;
+        this.orientationManager.setTargetDirection(targetDirection);
+        console.log('Applied target direction:', targetDirection);
+        
+        // 方向名を表示
+        const directionNames = {0: '北', 90: '東', 180: '南', 270: '西'};
+        const directionName = directionNames[targetDirection] || '不明';
+        console.log(`Target direction set to: ${directionName} (${targetDirection}°)`);
     }
     
     loadSettings() {
@@ -199,6 +322,12 @@ class StretchTimerApp {
             intervalSlider.value = settings.interval;
             intervalValue.textContent = settings.interval;
             this.updatePresetButtons(settings.interval);
+        }
+        
+        // 方向設定
+        const directionSelect = document.getElementById('directionSelect');
+        if (directionSelect) {
+            directionSelect.value = settings.targetDirection || 0;
         }
         
         // 通知設定
@@ -259,8 +388,16 @@ class StretchTimerApp {
         this.showScreen('stretch');
         this.orientationManager.startMonitoring();
         
-        // 通知送信
+        // Chrome DevTools での確認用ログ
         const settings = this.storageManager.loadSettings();
+        const directionNames = {0: '北', 90: '東', 180: '南', 270: '西'};
+        const targetDirectionName = directionNames[settings.targetDirection || 0] || '不明';
+        
+        console.log('=== ストレッチ開始 ===');
+        console.log('目標方向:', targetDirectionName, `(${settings.targetDirection || 0}°)`);
+        console.log('Chrome DevTools > Sensors で alpha値を設定してテスト可能');
+        
+        // 通知送信
         if (settings.notifications) {
             this.notificationManager.showNotification(
                 'ストレッチの時間です！',

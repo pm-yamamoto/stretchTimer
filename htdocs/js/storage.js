@@ -76,8 +76,31 @@ export class StorageManager {
     
     saveSetting(key, value) {
         const settings = this.loadSettings();
+        
+        // バリデーション
+        if (key === 'interval') {
+            value = this.validateInterval(value);
+        }
+        
         settings[key] = value;
         return this.saveSettings(settings);
+    }
+    
+    validateInterval(value) {
+        // 数値に変換
+        const numValue = parseInt(value, 10);
+        
+        // 範囲チェック（3分〜240分）
+        if (isNaN(numValue) || numValue < 3) {
+            console.warn(`Interval value ${value} is too small, setting to 3 minutes`);
+            return 3;
+        }
+        if (numValue > 240) {
+            console.warn(`Interval value ${value} is too large, setting to 240 minutes`);
+            return 240;
+        }
+        
+        return numValue;
     }
     
     getSetting(key) {
