@@ -79,6 +79,17 @@ body {
     background-color: var(--bg-primary);
     min-height: 100vh;
     overflow-x: hidden;
+    
+    /* iOS対応 */
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-touch-callout: none;
+    
+    /* セーフエリア対応 */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
 }
 
 /* アプリコンテナ */
@@ -254,6 +265,17 @@ body {
     transition: all var(--transition-fast);
     min-height: 44px;
     line-height: 1.2;
+    
+    /* iOS タッチ対応 */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+    
+    /* より大きなタッチターゲット */
+    min-width: 44px;
+    position: relative;
 }
 
 .btn--primary {
@@ -309,11 +331,39 @@ body {
     box-shadow: none;
 }
 
+/* iOS タッチフィードバック */
+.btn:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+}
+
+.btn--primary:active {
+    background-color: #3d8b40;
+}
+
+.btn--outline:active {
+    background-color: var(--color-primary);
+    color: var(--text-inverse);
+}
+
+/* iOS Safari専用: タッチ後のスタイルリセット */
+@supports (-webkit-touch-callout: none) {
+    .btn {
+        -webkit-appearance: none;
+        appearance: none;
+    }
+    
+    .btn:focus {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}
+
 /* フローティングアクションボタン */
 .fab {
     position: fixed;
-    bottom: var(--spacing-lg);
-    right: var(--spacing-lg);
+    bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
+    right: calc(var(--spacing-lg) + env(safe-area-inset-right));
     width: 56px;
     height: 56px;
     border-radius: var(--radius-full);
@@ -333,6 +383,43 @@ body {
 .fab:hover {
     transform: scale(1.1);
     box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* iOS FABタッチ対応 */
+.fab {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.fab:active {
+    transform: scale(0.9);
+}
+
+/* モバイルでのホバー効果調整 */
+@media (hover: none) and (pointer: coarse) {
+    .btn:hover,
+    .btn--primary:hover,
+    .btn--outline:hover,
+    .btn--link:hover,
+    .fab:hover {
+        transform: none;
+        background-color: initial;
+        color: initial;
+        box-shadow: initial;
+    }
+    
+    .btn--primary:hover {
+        background-color: var(--color-primary);
+        color: var(--text-inverse);
+    }
+    
+    .btn--outline:hover {
+        background-color: transparent;
+        color: var(--color-primary);
+    }
 }
 
 /* 画面切り替え */

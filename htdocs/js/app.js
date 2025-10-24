@@ -3,6 +3,7 @@ import { OrientationManager } from './orientation.js';
 import { NotificationManager } from './notification.js';
 import { StorageManager } from './storage.js';
 import { PWAManager } from './pwa.js';
+import { touchHelper } from './touch-helper.js';
 
 class StretchTimerApp {
     constructor() {
@@ -24,8 +25,19 @@ class StretchTimerApp {
         this.updateUI();
         this.startInitialTimer();
         
+        // iOS対応のタッチ設定
+        this.setupTouchHandling();
+        
         this.timerManager.on('complete', this.handleTimerComplete.bind(this));
         this.orientationManager.on('statusChange', this.handleOrientationChange.bind(this));
+    }
+    
+    setupTouchHandling() {
+        // すべてのボタンにiOS対応を適用
+        touchHelper.setupAllButtons();
+        
+        // デバッグ情報をコンソールに出力
+        console.log('Touch Helper Debug:', touchHelper.getDebugInfo());
     }
     
     setupEventListeners() {
@@ -33,16 +45,28 @@ class StretchTimerApp {
         const settingsBtn = document.getElementById('settingsBtn');
         const backBtn = document.getElementById('backBtn');
         
-        settingsBtn?.addEventListener('click', () => this.showScreen('settings'));
-        backBtn?.addEventListener('click', () => this.showScreen('main'));
+        touchHelper.addTouchListener(settingsBtn, () => this.showScreen('settings'), {
+            preventDefault: true,
+            debounce: 200
+        });
+        touchHelper.addTouchListener(backBtn, () => this.showScreen('main'), {
+            preventDefault: true,
+            debounce: 200
+        });
         
         // ストレッチ完了ボタン
         const completeBtn = document.getElementById('completeBtn');
-        completeBtn?.addEventListener('click', this.handleStretchComplete.bind(this));
+        touchHelper.addTouchListener(completeBtn, this.handleStretchComplete.bind(this), {
+            preventDefault: true,
+            debounce: 300
+        });
         
         // 次のカウントダウン開始ボタン
         const nextCountdownBtn = document.getElementById('nextCountdownBtn');
-        nextCountdownBtn?.addEventListener('click', this.startNewTimer.bind(this));
+        touchHelper.addTouchListener(nextCountdownBtn, this.startNewTimer.bind(this), {
+            preventDefault: true,
+            debounce: 300
+        });
         
         // 設定変更イベント
         this.setupSettingsEvents();
@@ -62,12 +86,15 @@ class StretchTimerApp {
         // プリセットボタン
         const presetButtons = document.querySelectorAll('.preset-btn');
         presetButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            touchHelper.addTouchListener(btn, (e) => {
                 const value = parseInt(e.target.dataset.value);
                 intervalSlider.value = value;
                 intervalValue.textContent = value;
                 this.storageManager.saveSetting('interval', value);
                 this.updatePresetButtons(value);
+            }, {
+                preventDefault: true,
+                debounce: 200
             });
         });
         
