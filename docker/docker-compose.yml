@@ -1,0 +1,48 @@
+services:
+
+  stretch_mysql:
+    image: mysql:8.4
+    platform: linux/amd64
+    environment:
+      MYSQL_ROOT_PASSWORD: pm3481
+      MYSQL_DATABASE: stretch
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: pm3481
+      TZ: Asia/Tokyo
+    ports:
+      - "13306:3306"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    container_name: stretch_mysql
+
+  stretch_ubuntu24:
+    build: ./Ubuntu
+    platform: linux/amd64
+    environment:
+      TZ: Asia/Tokyo
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8000:8000"  # Python HTTP server
+      - "3000:3000"  # Node.js dev server
+      - "8080:8080"  # Alternative dev server
+    volumes:
+      - ../htdocs:/home/stretch/htdocs:cached
+      - ../webapp:/home/stretch/webapp:cached
+      - ../docs:/home/stretch/docs:cached
+    links:
+      - stretch_mysql
+      - stretch_mailhog
+    privileged: true
+    container_name: stretch_ubuntu24
+    working_dir: /home/stretch
+
+  stretch_mailhog:
+    image: mailhog/mailhog:latest
+    platform: linux/amd64
+    ports:
+      - 8025:8025
+      #- 1025:1025
+    container_name: stretch_mailhog

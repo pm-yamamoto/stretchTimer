@@ -1,0 +1,271 @@
+/* ダークモード設定 */
+
+/* システムのダークモード設定を検出 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-primary: #FFFFFF;
+        --text-secondary: #B0B0B0;
+        --text-disabled: #666666;
+        --text-inverse: #000000;
+        
+        --bg-primary: #121212;
+        --bg-secondary: #1E1E1E;
+        --bg-surface: #2D2D2D;
+        --bg-dark: #0F0F0F;
+        --bg-darker: #000000;
+        
+        --border-light: #333333;
+        --border-medium: #555555;
+        --border-dark: #777777;
+        
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+    }
+}
+
+/* 手動ダークモード切り替え用のクラス */
+[data-theme="dark"] {
+    --text-primary: #FFFFFF;
+    --text-secondary: #B0B0B0;
+    --text-disabled: #666666;
+    --text-inverse: #000000;
+    
+    --bg-primary: #121212;
+    --bg-secondary: #1E1E1E;
+    --bg-surface: #2D2D2D;
+    --bg-dark: #0F0F0F;
+    --bg-darker: #000000;
+    
+    --border-light: #333333;
+    --border-medium: #555555;
+    --border-dark: #777777;
+    
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* ダークモード時の特別なスタイル調整 */
+@media (prefers-color-scheme: dark),
+[data-theme="dark"] {
+    
+    /* タイマー表示の調整 */
+    .timer-display {
+        background: var(--bg-darker);
+        border: 1px solid var(--border-light);
+    }
+    
+    .timer-display__time {
+        color: #FFFFFF;
+        text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+    }
+    
+    /* プログレスバーの調整 */
+    .progress-bar {
+        background-color: var(--border-medium);
+    }
+    
+    .progress-bar__fill {
+        background: linear-gradient(90deg, #4CAF50, #66BB6A);
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+    }
+    
+    /* ボタンの調整 */
+    .btn--primary {
+        background-color: var(--color-primary);
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
+    }
+    
+    .btn--primary:hover:not(:disabled) {
+        background-color: #66BB6A;
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+    
+    .btn--outline {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+    }
+    
+    .btn--outline:hover:not(:disabled) {
+        background-color: var(--color-primary);
+        color: var(--text-inverse);
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    }
+    
+    .btn--disabled {
+        background-color: var(--border-medium);
+        color: var(--text-disabled);
+    }
+    
+    /* FABの調整 */
+    .fab {
+        background-color: var(--color-primary);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+    
+    .fab:hover {
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5), 
+                    0 0 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    /* 状態アイテムの調整 */
+    .status-item {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-light);
+    }
+    
+    .status-item__icon--success {
+        background-color: var(--color-success);
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+    }
+    
+    .status-item__icon--warning {
+        background-color: var(--color-warning);
+        box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+    }
+    
+    .status-item__icon--inactive {
+        background-color: var(--border-medium);
+    }
+    
+    /* 完了セクションの調整 */
+    .completion-section {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-light);
+    }
+    
+    /* トグルスイッチの調整 */
+    .toggle__slider {
+        background-color: var(--border-medium);
+    }
+    
+    .toggle input:checked + .toggle__slider {
+        background-color: var(--color-primary);
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    }
+    
+    .toggle__slider::before {
+        background-color: var(--bg-primary);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* スライダーの調整 */
+    .setting-item__slider {
+        background: var(--border-medium);
+    }
+    
+    .setting-item__slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: var(--color-primary);
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+    }
+    
+    .setting-item__slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: var(--color-primary);
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+    }
+    
+    /* フォーカス時の調整 */
+    .btn:focus,
+    .toggle:focus-within,
+    .setting-item__slider:focus {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+    
+    /* スクロールバーの調整（Webkit系ブラウザ） */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: var(--border-medium);
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--border-dark);
+    }
+}
+
+/* ダークモード専用のアニメーション */
+@media (prefers-color-scheme: dark),
+[data-theme="dark"] {
+    @keyframes glowPulse {
+        0%, 100% {
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+        }
+        50% {
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+        }
+    }
+    
+    .timer-display__time {
+        animation: glowPulse 3s infinite ease-in-out;
+    }
+    
+    .progress-bar__fill {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .progress-bar__fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255, 255, 255, 0.2), 
+            transparent
+        );
+        animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% {
+            left: -100%;
+        }
+        100% {
+            left: 100%;
+        }
+    }
+}
+
+/* ライトモード強制時の調整 */
+[data-theme="light"] {
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --text-disabled: #BDBDBD;
+    --text-inverse: #FFFFFF;
+    
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F5F5F5;
+    --bg-surface: #FFFFFF;
+    --bg-dark: #1E2A3A;
+    --bg-darker: #152030;
+    
+    --border-light: #E0E0E0;
+    --border-medium: #BDBDBD;
+    --border-dark: #9E9E9E;
+    
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+}

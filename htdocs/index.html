@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="定期的なストレッチを促進するタイマーアプリ">
+    <meta name="theme-color" content="#4CAF50">
+    
+    <!-- PWA設定 -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/dark-theme.css">
+    
+    <!-- セキュリティ設定 -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self';
+        style-src 'self' 'unsafe-inline';
+        img-src 'self' data:;
+        connect-src 'self';
+    ">
+    
+    <title>ストレッチタイマー</title>
+</head>
+<body>
+    <div class="app-container">
+        <!-- メイン画面 -->
+        <main class="main-screen" id="mainScreen">
+            <!-- ヘッダー -->
+            <header class="header">
+                <h1 class="header__title">NEXT STRETCH IN</h1>
+            </header>
+            
+            <!-- タイマー表示エリア -->
+            <section class="timer-section">
+                <div class="timer-display">
+                    <div class="timer-display__time" id="timerDisplay">00:30:00</div>
+                </div>
+                
+                <div class="timer-info">
+                    <p class="timer-info__next-time">次回予定時刻: <span id="nextTime">18:24:30</span></p>
+                </div>
+                
+                <!-- プログレスバー -->
+                <div class="progress-bar">
+                    <div class="progress-bar__fill" id="progressBar"></div>
+                </div>
+                
+                <p class="timer-status" id="timerStatus">タイマー作動中、完了までお待ちください。</p>
+            </section>
+            
+            <!-- コントロールボタン -->
+            <section class="controls">
+                <button class="btn btn--link" id="nextCountdownBtn">次のカウントダウンを開始</button>
+                <p class="last-record">最終記録: <span id="lastRecord">未記録</span></p>
+            </section>
+        </main>
+        
+        <!-- ストレッチ完了画面 -->
+        <div class="stretch-screen" id="stretchScreen" style="display: none;">
+            <header class="header">
+                <h1 class="header__title">NEXT STRETCH IN</h1>
+            </header>
+            
+            <section class="timer-section">
+                <div class="timer-display">
+                    <div class="timer-display__time" id="stretchTimerDisplay">00:02:13</div>
+                </div>
+                
+                <div class="timer-info">
+                    <p class="timer-info__next-time">次回予定時刻: <span id="stretchNextTime">18:24:30</span></p>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-bar__fill" id="stretchProgressBar" style="width: 95%;"></div>
+                </div>
+                
+                <p class="timer-status">タイマー作動中、完了までお待ちください。</p>
+                <button class="btn btn--link">次のカウントダウンを開始</button>
+                <p class="last-record">最終記録: 未記録</p>
+            </section>
+            
+            <!-- 完了アクションセクション -->
+            <section class="completion-section">
+                <h2 class="completion-section__title">完了アクション</h2>
+                <p class="completion-section__description">
+                    タイマー完了後、立位と方向が一致すると「完了」ボタンが有効になります。
+                </p>
+                
+                <!-- 状態表示エリア -->
+                <div class="status-area">
+                    <div class="status-item">
+                        <div class="status-item__icon status-item__icon--inactive" id="timerIcon">⏱</div>
+                        <span class="status-item__text">タイマー残り <span id="timerRemaining">00:02:13</span></span>
+                    </div>
+                    
+                    <div class="status-item" id="uprightStatus">
+                        <div class="status-item__icon status-item__icon--success" id="uprightIcon">✓</div>
+                        <span class="status-item__text">立位検知済み</span>
+                    </div>
+                    
+                    <div class="status-item" id="directionStatus">
+                        <div class="status-item__icon status-item__icon--warning" id="directionIcon">●</div>
+                        <span class="status-item__text">方向不一致 (<span id="currentDirection">東</span>)</span>
+                    </div>
+                </div>
+                
+                <!-- 完了ボタン -->
+                <button class="btn btn--primary btn--disabled" id="completeBtn" disabled>
+                    ストレッチ完了を記録
+                </button>
+            </section>
+        </div>
+        
+        <!-- 設定画面 -->
+        <div class="settings-screen" id="settingsScreen" style="display: none;">
+            <header class="header">
+                <h1 class="header__title">設定</h1>
+                <button class="btn btn--text" id="backBtn">戻る</button>
+            </header>
+            
+            <section class="settings-content">
+                <div class="setting-item">
+                    <label for="intervalSlider" class="setting-item__label">ストレッチ間隔</label>
+                    <input type="range" id="intervalSlider" class="setting-item__slider" min="15" max="240" value="30" step="5">
+                    <span class="setting-item__value"><span id="intervalValue">30</span>分</span>
+                </div>
+                
+                <div class="setting-presets">
+                    <button class="btn btn--outline preset-btn" data-value="30">30分</button>
+                    <button class="btn btn--outline preset-btn" data-value="60">60分</button>
+                    <button class="btn btn--outline preset-btn" data-value="90">90分</button>
+                    <button class="btn btn--outline preset-btn" data-value="120">120分</button>
+                </div>
+                
+                <div class="setting-item">
+                    <label class="setting-item__label">通知設定</label>
+                    <div class="toggle-group">
+                        <label class="toggle">
+                            <input type="checkbox" id="notificationToggle" checked>
+                            <span class="toggle__slider"></span>
+                            通知を有効にする
+                        </label>
+                        <label class="toggle">
+                            <input type="checkbox" id="vibrationToggle" checked>
+                            <span class="toggle__slider"></span>
+                            振動を有効にする
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <label class="toggle">
+                        <input type="checkbox" id="darkModeToggle">
+                        <span class="toggle__slider"></span>
+                        ダークモード
+                    </label>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <!-- フローティングボタン -->
+    <button class="fab" id="settingsBtn" aria-label="設定を開く">⚙️</button>
+    
+    <!-- JavaScript -->
+    <script src="/js/storage.js" type="module"></script>
+    <script src="/js/timer.js" type="module"></script>
+    <script src="/js/orientation.js" type="module"></script>
+    <script src="/js/notification.js" type="module"></script>
+    <script src="/js/pwa.js" type="module"></script>
+    <script src="/js/app.js" type="module"></script>
+</body>
+</html>

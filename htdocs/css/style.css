@@ -1,0 +1,494 @@
+/* CSS Variables - カラーパレットとスペーシング */
+:root {
+    /* カラーパレット */
+    --color-primary: #4CAF50;
+    --color-secondary: #FFC107;
+    --color-success: #4CAF50;
+    --color-error: #F44336;
+    --color-warning: #FF9800;
+    --color-info: #2196F3;
+    
+    /* テキストカラー */
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --text-disabled: #BDBDBD;
+    --text-inverse: #FFFFFF;
+    
+    /* 背景カラー */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F5F5F5;
+    --bg-surface: #FFFFFF;
+    --bg-dark: #1E2A3A;
+    --bg-darker: #152030;
+    
+    /* ボーダーカラー */
+    --border-light: #E0E0E0;
+    --border-medium: #BDBDBD;
+    --border-dark: #9E9E9E;
+    
+    /* スペーシング */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+    
+    /* フォントサイズ */
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-md: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 24px;
+    --font-size-xxl: 32px;
+    --font-size-display: 48px;
+    
+    /* シャドウ */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+    
+    /* ボーダーラディウス */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 50%;
+    
+    /* トランジション */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* リセットCSS */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* アプリコンテナ */
+.app-container {
+    min-height: 100vh;
+    position: relative;
+}
+
+/* ヘッダー */
+.header {
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-md) var(--spacing-lg);
+    position: relative;
+}
+
+.header__title {
+    font-size: var(--font-size-lg);
+    font-weight: 300;
+    color: var(--text-secondary);
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+/* タイマーセクション */
+.timer-section {
+    padding: 0 var(--spacing-md);
+    text-align: center;
+    margin-bottom: var(--spacing-xxl);
+}
+
+.timer-display {
+    background: var(--bg-dark);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin: var(--spacing-lg) 0;
+    box-shadow: var(--shadow-lg);
+}
+
+.timer-display__time {
+    font-size: var(--font-size-display);
+    font-weight: 300;
+    color: var(--text-inverse);
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    letter-spacing: 2px;
+}
+
+.timer-info {
+    margin: var(--spacing-lg) 0;
+}
+
+.timer-info__next-time {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* プログレスバー */
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background-color: var(--border-light);
+    border-radius: var(--radius-sm);
+    margin: var(--spacing-md) 0;
+    overflow: hidden;
+}
+
+.progress-bar__fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+    width: 0%;
+    transition: width var(--transition-normal);
+    border-radius: var(--radius-sm);
+}
+
+/* タイマーステータス */
+.timer-status {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: var(--spacing-md) 0;
+}
+
+/* コントロール */
+.controls {
+    text-align: center;
+    padding: 0 var(--spacing-md);
+}
+
+.last-record {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-top: var(--spacing-md);
+}
+
+/* 完了セクション */
+.completion-section {
+    padding: var(--spacing-lg) var(--spacing-md);
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    margin: var(--spacing-lg);
+}
+
+.completion-section__title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.completion-section__description {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.6;
+}
+
+/* 状態エリア */
+.status-area {
+    margin: var(--spacing-lg) 0;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    background-color: var(--bg-primary);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.status-item__icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--spacing-md);
+    font-size: var(--font-size-md);
+    border-radius: var(--radius-full);
+}
+
+.status-item__icon--success {
+    background-color: var(--color-success);
+    color: var(--text-inverse);
+}
+
+.status-item__icon--warning {
+    background-color: var(--color-warning);
+    color: var(--text-inverse);
+}
+
+.status-item__icon--inactive {
+    background-color: var(--border-medium);
+    color: var(--text-inverse);
+}
+
+.status-item__text {
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+}
+
+/* ボタンスタイル */
+.btn {
+    display: inline-block;
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-height: 44px;
+    line-height: 1.2;
+}
+
+.btn--primary {
+    background-color: var(--color-primary);
+    color: var(--text-inverse);
+}
+
+.btn--primary:hover:not(:disabled) {
+    background-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn--outline {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+}
+
+.btn--outline:hover:not(:disabled) {
+    background-color: var(--color-primary);
+    color: var(--text-inverse);
+}
+
+.btn--link {
+    background-color: transparent;
+    color: var(--color-primary);
+    text-decoration: underline;
+    padding: var(--spacing-sm);
+}
+
+.btn--link:hover:not(:disabled) {
+    color: #45a049;
+}
+
+.btn--text {
+    background-color: transparent;
+    color: var(--text-primary);
+    padding: var(--spacing-sm);
+}
+
+.btn--disabled {
+    background-color: var(--border-light);
+    color: var(--text-disabled);
+    cursor: not-allowed;
+}
+
+.btn:disabled {
+    background-color: var(--border-light);
+    color: var(--text-disabled);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* フローティングアクションボタン */
+.fab {
+    position: fixed;
+    bottom: var(--spacing-lg);
+    right: var(--spacing-lg);
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-primary);
+    color: var(--text-inverse);
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    transition: all var(--transition-fast);
+    z-index: 1000;
+}
+
+.fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* 画面切り替え */
+.main-screen,
+.stretch-screen,
+.settings-screen {
+    min-height: 100vh;
+    transition: opacity var(--transition-normal);
+}
+
+.stretch-screen {
+    background-color: var(--bg-primary);
+}
+
+/* 設定画面 */
+.settings-content {
+    padding: var(--spacing-lg);
+}
+
+.setting-item {
+    margin-bottom: var(--spacing-xl);
+}
+
+.setting-item__label {
+    display: block;
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.setting-item__slider {
+    width: 100%;
+    height: 6px;
+    border-radius: var(--radius-sm);
+    background: var(--border-light);
+    outline: none;
+    margin: var(--spacing-sm) 0;
+}
+
+.setting-item__value {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    display: block;
+    text-align: right;
+}
+
+.setting-presets {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+    margin: var(--spacing-md) 0;
+}
+
+.preset-btn {
+    font-size: var(--font-size-sm);
+}
+
+/* トグルスイッチ */
+.toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: var(--spacing-md);
+}
+
+.toggle input {
+    display: none;
+}
+
+.toggle__slider {
+    position: relative;
+    width: 50px;
+    height: 24px;
+    background-color: var(--border-medium);
+    border-radius: 24px;
+    margin-right: var(--spacing-md);
+    transition: background-color var(--transition-fast);
+}
+
+.toggle__slider::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: var(--bg-primary);
+    border-radius: var(--radius-full);
+    transition: transform var(--transition-fast);
+}
+
+.toggle input:checked + .toggle__slider {
+    background-color: var(--color-primary);
+}
+
+.toggle input:checked + .toggle__slider::before {
+    transform: translateX(26px);
+}
+
+.toggle-group {
+    margin-top: var(--spacing-sm);
+}
+
+/* ユーティリティクラス */
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: var(--spacing-xs); }
+.mb-2 { margin-bottom: var(--spacing-sm); }
+.mb-3 { margin-bottom: var(--spacing-md); }
+.mb-4 { margin-bottom: var(--spacing-lg); }
+.mb-5 { margin-bottom: var(--spacing-xl); }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: var(--spacing-xs); }
+.mt-2 { margin-top: var(--spacing-sm); }
+.mt-3 { margin-top: var(--spacing-md); }
+.mt-4 { margin-top: var(--spacing-lg); }
+.mt-5 { margin-top: var(--spacing-xl); }
+
+/* アニメーション */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.fade-in {
+    animation: fadeIn var(--transition-normal) ease-out;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
